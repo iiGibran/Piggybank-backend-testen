@@ -21,26 +21,31 @@ public class AccountControllerIntegrationTest {
     @Autowired
     private AccountController accountController;
 
-    // Mocking  the AccountService
+    // Mocking the AccountService
     @MockBean
     private AccountService mockAccountService;
 
-    // Test for the getAccount method in AccountController
+    // Test for the getAccount method
     @Test
     public void testGetAccount() {
+        // Providing a mock account for the given account ID
         long accountId = 1;
         Account mockAccount = new Account();
         mockAccount.setId(accountId);
         when(mockAccountService.getAccount(accountId)).thenReturn(Optional.of(mockAccount));
+
+        // Executing the method for the mocked account
         ResponseEntity<AccountResponse> responseEntity = accountController.getAccount(accountId);
 
+        // Verifying the result
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode(), "Response should be OK");
         assertEquals(accountId, responseEntity.getBody().getId(), "Account ID should match");
     }
 
-    // Test for the getAccounts method in AccountController
+    // Test for the getAccounts method
     @Test
     public void testGetAccountsByUserId() {
+        // Providing mock accounts for the given user ID
         long userId = 1L;
         List<Account> mockAccounts = Arrays.asList(new Account(), new Account());
         when(mockAccountService.getAccountsByUserId(userId)).thenReturn(mockAccounts);
@@ -49,5 +54,18 @@ public class AccountControllerIntegrationTest {
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode(), "Response should be OK");
         assertEquals(2, responseEntity.getBody().getAccounts().size(), "Number of accounts should be 2");
+    }
+
+    // Test for the updateAccount method
+    @Test
+    public void testUpdateAccount() {
+        // Creating an update request
+        UpdateAccountRequest updateRequest = new UpdateAccountRequest();
+        updateRequest.setAccountId(1L);
+        updateRequest.setAccountName("NewAccountName");
+
+        ResponseEntity<HttpStatus> responseEntity = accountController.updateAccount(updateRequest);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode(), "Response should be OK");
     }
 }
